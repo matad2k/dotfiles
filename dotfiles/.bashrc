@@ -118,3 +118,108 @@ eval "$(~/.rbenv/bin/rbenv init - --no-rehash bash)"
 . "$HOME/.cargo/env"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# =====================================================
+# DODATKOWE ALIASY I FUNKCJE
+# Dodaj na końcu swojego .bashrc
+# =====================================================
+
+# Przydatne aliasy
+alias ll='ls -alF'
+alias la='ls -A' 
+alias l='ls -CF'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+# Git aliasy (skoro używasz programowania)
+alias gs='git status'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git log --oneline --graph'
+alias gd='git diff'
+alias gb='git branch'
+alias gco='git checkout'
+
+# Nvim aliasy
+alias vim='nvim'
+alias vi='nvim'
+alias v='nvim'
+
+# Bezpieczne operacje
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+
+# System info
+alias df='df -h'
+alias du='du -h'
+alias free='free -h'
+alias ports='netstat -tulanp'
+
+# Funkcje
+# Utwórz katalog i przejdź do niego
+mkcd() {
+    mkdir -p "$1" && cd "$1"
+}
+
+# Git branch w prompt (jeśli chcesz dodać info o git)
+parse_git_branch() {
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+
+# Ulepszona funkcja find z fzf
+ff() {
+    if command -v fzf >/dev/null 2>&1; then
+        find . -type f | fzf
+    else
+        find . -type f -iname "*$1*"
+    fi
+}
+
+# Szybkie znajdowanie w historii z fzf
+h() {
+    if command -v fzf >/dev/null 2>&1; then
+        history | fzf | cut -c 8-
+    else
+        history | grep "$1"
+    fi
+}
+
+# Funkcja do szybkiego uruchamiania serwerów
+serve() {
+    local port="${1:-8000}"
+    if command -v python3 >/dev/null 2>&1; then
+        echo "Serwer uruchomiony na http://localhost:$port"
+        python3 -m http.server "$port"
+    elif command -v python >/dev/null 2>&1; then
+        echo "Serwer uruchomiony na http://localhost:$port"  
+        python -m SimpleHTTPServer "$port"
+    else
+        echo "Python nie jest zainstalowany"
+    fi
+}
+
+# Informacje o systemie
+sysinfo() {
+    echo "===== SYSTEM INFO ====="
+    echo "Hostname: $(hostname)"
+    echo "Uptime: $(uptime -p 2>/dev/null || uptime)"
+    echo "User: $USER"
+    echo "Shell: $SHELL"
+    echo "Date: $(date)"
+    echo "Memory:"
+    free -h 2>/dev/null || free
+    echo "Disk usage:"
+    df -h | head -5
+}
+
+# FZF konfiguracja (jeśli chcesz dostosować)
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+export FZF_DEFAULT_COMMAND='find . -type f -not -path "*/\.*" 2> /dev/null'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+# Dodatkowe zmienne środowiskowe
+export HISTTIMEFORMAT="%F %T "  # Timestamps w historii
+export LESS="-R"                # Kolorowe less
